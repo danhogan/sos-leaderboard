@@ -223,9 +223,14 @@ Promise.all(promises).then((data) => {
         }
     });
 
+    const withDate = {
+        theData: withOverallRanking,
+        updateDate: Date.now()
+    }
+
     
     const today = new Date().toISOString().slice(0, 10);
 
-    fs.writeFileSync(`../src/allTheData.json`, JSON.stringify(withOverallRanking));
-    fs.writeFileSync(`../src/history/allTheData-${today}.json`, JSON.stringify(withOverallRanking));
+    fs.writeFileSync(`../src/allTheData.json`, JSON.stringify(withDate));
+    fs.writeFileSync(`../src/history/allTheData-${today}.json`, JSON.stringify(withDate));
 });

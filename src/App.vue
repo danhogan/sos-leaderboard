@@ -11,7 +11,9 @@
 
             <v-spacer></v-spacer>
 
-            <v-btn href="https://github.com/vuetifyjs/vuetify/releases/latest" target="_blank" text>
+            <span>Last Updated: {{formattedDate}}</span>
+
+            <v-btn href="https://github.com/danhogan/sos-leaderboard" target="_blank" text>
                 <span class="mr-2">Github</span>
                 <v-icon>mdi-open-in-new</v-icon>
             </v-btn>
@@ -22,6 +24,22 @@
         </v-main>
     </v-app>
 </template>
+
+<script>
+    import jsonData from "../src/allTheData.json";
+
+    export default {
+        data: () => ({
+            date: jsonData.updateDate,
+        }),
+        computed: {
+            formattedDate: function(){
+                const theDate = new Date(this.date);
+                return `${theDate.toLocaleDateString()} @ ${theDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+            }
+        }
+    }
+</script>
 
 <style lang="scss">
 #app {
@@ -43,5 +61,25 @@
             color: #42b983;
         }
     }
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #222;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #555;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #888;
 }
 </style>

@@ -16,7 +16,6 @@
             <v-data-table :headers="headers" :items="data" :items-per-page="500">
                 <template v-for="(thing, index) in statTypes" v-slot:[`item.stats.${thing}`]="{ item }">
                     <v-chip :key="`thing${index}`" :color="getColor(item[statValueLocation][thing])" dark>{{ item.stats[thing] }} ({{ item[statValueLocation][thing] }})</v-chip>
-                    <!-- <span :key="`thing${index}`">{{ item.statValues[thing] }}</span> -->
                 </template>
                 <template v-slot:[`item.teamName`]="{ item }">
                     <a target="_blank" :href="`https://www.fleaflicker.com/mlb/leagues/${item.leagueId}/teams/${item.teamId}`">{{item.teamName}}</a>
@@ -35,7 +34,7 @@ import jsonData from "../../src/allTheData.json";
 export default {
     name: "App",
     data: () => ({
-        data: jsonData,
+        data: jsonData.theData,
         selectedDivision: 0,
         statValueLocation: 'statValues',
         statTypes: ["HR", "R", "RBI", "SB", "OBP", "OPS", "SO", "SV", "HD", "ERA", "WHP", "QS"],
@@ -60,17 +59,13 @@ export default {
             { text: "QS", value: "stats.QS" },
         ],
     }),
-    created() {
-        //put overall value calculations on the backend
-        console.log("this.data:", this.data);
-    },
     watch: {
         selectedDivision: function(){
             if (this.selectedDivision){ //0 is all
-                this.data = jsonData.filter(x => x.division === this.selectedDivision);
+                this.data = jsonData.theData.filter(x => x.division === this.selectedDivision);
                 this.statValueLocation = 'divisionValues';
             } else {
-                this.data = jsonData;
+                this.data = jsonData.theData;
                 this.statValueLocation = 'statValues';
                 
             }
