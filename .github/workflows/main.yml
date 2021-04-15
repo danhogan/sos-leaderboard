@@ -39,7 +39,7 @@ jobs:
           node dewIt.js
           
       - name: Build
-      - working-directory: sos-leaderboard
-      - run: |
+        working-directory: sos-leaderboard
+        run: |
           NODE_ENV=development npm ci
           npm run build
