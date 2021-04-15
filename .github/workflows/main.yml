@@ -40,10 +40,11 @@ jobs:
           npm install
           node dewIt.js
           
-      - name: Build
+      - name: Commit
         working-directory: ./
         run: |
           pwd
           ls -la
-          NODE_ENV=development npm ci
-          npm run build
+          git status
+        # NODE_ENV=development npm ci
+        # npm run build
