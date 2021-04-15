@@ -32,13 +32,14 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Open Web Client Directory
+      - name: Run dewIt
         working-directory: dataGrabber
         run: |
-          ls -la
-
-      - run: npm install --prefix ./dataGrabber
-      - run: node ./dataGrabber/dewIt.js
+          npm install
+          node dewIt.js
+          
+      - name: Build
+      - working-directory: sos-leaderboard
       - run: |
           NODE_ENV=development npm ci
           npm run build
