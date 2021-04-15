@@ -46,6 +46,8 @@ jobs:
           pwd
           ls -la
           git status
+          git config --local user.email "$(git log --format='%ae' HEAD^!)"
+          git config --local user.name "$(git log --format='%an' HEAD^!)"
           git add .
           git commit -m "data update"
           git push
