@@ -35,11 +35,15 @@ jobs:
       - name: Run dewIt
         working-directory: dataGrabber
         run: |
+          pwd
+          ls -la
           npm install
           node dewIt.js
           
       - name: Build
-        working-directory: sos-leaderboard
+        working-directory: ./
         run: |
+          pwd
+          ls -la
           NODE_ENV=development npm ci
           npm run build
