@@ -64,10 +64,13 @@ export default {
             if (this.selectedDivision){ //0 is all
                 this.data = jsonData.theData.filter(x => x.division === this.selectedDivision);
                 this.statValueLocation = 'divisionValues';
+                this.$set(this.headers, 3, {text: "Division Ranking", value: "divisionRank"});
+                this.$set(this.headers, 4, {text: "Division Points", value: "divisionPoints"});
             } else {
                 this.data = jsonData.theData;
                 this.statValueLocation = 'statValues';
-                
+                this.$set(this.headers, 3, {text: "Overall Ranking", value: "overallRank"});
+                this.$set(this.headers, 4, {text: "Total Points", value: "totalPoints"});
             }
         }
     },
@@ -84,3 +87,9 @@ export default {
     },
 };
 </script>
+
+<style>
+#app .v-data-table > .v-data-table__wrapper > table > tbody > tr > td, .v-data-table > .v-data-table__wrapper > table > tbody > tr > th, .v-data-table > .v-data-table__wrapper > table > thead > tr > td, .v-data-table > .v-data-table__wrapper > table > thead > tr > th, .v-data-table > .v-data-table__wrapper > table > tfoot > tr > td, .v-data-table > .v-data-table__wrapper > table > tfoot > tr > th {
+    padding: 0 12px;
+}
+</style>

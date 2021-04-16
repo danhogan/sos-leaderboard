@@ -215,11 +215,13 @@ Promise.all(promises).then((data) => {
     });
 
     const sortedByTotalPoints = withTotal.sort((a, b) => (a.totalPoints < b.totalPoints) ? 1 : -1);
+    const sortedByDivisionPoints = withTotal.sort((a, b) => (a.divisionPoints < b.divisionPoints) ? 1 : -1);
 
     const withOverallRanking = sortedByTotalPoints.map((team) => {
         return {
             ...team,
-            overallRank: sortedByTotalPoints.findIndex(x => x.totalPoints === team.totalPoints) + 1
+            overallRank: sortedByTotalPoints.findIndex(x => x.totalPoints === team.totalPoints) + 1,
+            divisionRank: sortedByDivisionPoints.filter(y => y.division === team.division).findIndex(x => x.divisionPoints === team.divisionPoints) + 1
         }
     });
 
