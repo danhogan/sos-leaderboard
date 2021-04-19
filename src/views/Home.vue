@@ -1,30 +1,16 @@
 <template>
     <div>
-        <v-row>
-            <v-col cols="12" sm="6" class="py-2">
-                <v-btn-toggle v-model="selectedDivision">
-                    <v-btn>All</v-btn>
-                    <v-btn>D1</v-btn>
-                    <v-btn>D2</v-btn>
-                    <v-btn>D3</v-btn>
-                    <v-btn>D4</v-btn>
-                </v-btn-toggle>
-            </v-col>
-        </v-row>
-
-        <v-row>
-            <v-data-table :headers="headers" :items="data" :items-per-page="500">
-                <template v-for="(thing, index) in statTypes" v-slot:[`item.stats.${thing}`]="{ item }">
-                    <v-chip :key="`thing${index}`" :color="getColor(item[statValueLocation][thing])" dark>{{ item.stats[thing] }} ({{ item[statValueLocation][thing] }})</v-chip>
-                </template>
-                <template v-slot:[`item.teamName`]="{ item }">
-                    <a target="_blank" :href="`https://www.fleaflicker.com/mlb/leagues/${item.leagueId}/teams/${item.teamId}`">{{item.teamName}}</a>
-                </template>
-                <template v-slot:[`item.leagueName`]="{ item }">
-                    <a target="_blank" :href="`https://www.fleaflicker.com/mlb/leagues/${item.leagueId}`">{{item.leagueName}}</a>
-                </template>
-            </v-data-table>
-        </v-row>
+        <v-data-table :headers="headers" :items="data" :items-per-page="500">
+            <template v-for="(thing, index) in statTypes" v-slot:[`item.stats.${thing}`]="{ item }">
+                <v-chip :key="`thing${index}`" :color="getColor(item[statValueLocation][thing])" dark>{{ item.stats[thing] }} ({{ item[statValueLocation][thing] }})</v-chip>
+            </template>
+            <template v-slot:[`item.teamName`]="{ item }">
+                <a target="_blank" :href="`https://www.fleaflicker.com/mlb/leagues/${item.leagueId}/teams/${item.teamId}`">{{item.teamName}}</a>
+            </template>
+            <template v-slot:[`item.leagueName`]="{ item }">
+                <a target="_blank" :href="`https://www.fleaflicker.com/mlb/leagues/${item.leagueId}`">{{item.leagueName}}</a>
+            </template>
+        </v-data-table>
     </div>
 </template>
 
@@ -33,9 +19,11 @@ import jsonData from "../../src/allTheData.json";
 
 export default {
     name: "App",
+    props: {
+        selectedDivision: Number
+    },
     data: () => ({
         data: jsonData.theData,
-        selectedDivision: 0,
         statValueLocation: 'statValues',
         statTypes: ["HR", "R", "RBI", "SB", "OBP", "OPS", "SO", "SV", "HD", "ERA", "WHP", "QS"],
         headers: [

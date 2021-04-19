@@ -11,6 +11,16 @@
 
             <v-spacer></v-spacer>
 
+            <v-btn-toggle v-model="theDivision">
+                <v-btn>All</v-btn>
+                <v-btn>D1</v-btn>
+                <v-btn>D2</v-btn>
+                <v-btn>D3</v-btn>
+                <v-btn>D4</v-btn>
+            </v-btn-toggle>
+
+            <v-spacer></v-spacer>
+
             <span>Last Updated: {{formattedDate}}</span>
 
             <v-btn href="https://github.com/danhogan/sos-leaderboard" target="_blank" text>
@@ -20,7 +30,7 @@
         </v-app-bar>
 
         <v-main>
-            <router-view></router-view>
+            <router-view :selectedDivision="theDivision"></router-view>
         </v-main>
     </v-app>
 </template>
@@ -31,6 +41,7 @@
     export default {
         data: () => ({
             date: jsonData.updateDate,
+            theDivision: 0
         }),
         computed: {
             formattedDate: function(){
