@@ -66,10 +66,12 @@ export default {
         getColor(rank){
             let dataCount = this.data.length;
 
-            if (rank/dataCount < .25) return 'red darken-4'
-            else if (rank/dataCount < .5) return 'red'
-            else if (rank/dataCount < .75) return 'orange'
-            else if (rank/dataCount < .95) return 'green lighten-2'
+            if (rank/dataCount < .1) return 'red darken-4'
+            else if (rank/dataCount < .25) return 'red darken-2'
+            else if (rank/dataCount < .4) return 'red'
+            else if (rank/dataCount < .55) return 'orange darken-1'
+            else if (rank/dataCount < .7) return 'yellow darken-2'
+            else if (rank/dataCount < .85) return 'green lighten-2'
             else return 'green'
         },
     },
