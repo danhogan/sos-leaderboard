@@ -1,55 +1,17 @@
 const fetch = require("node-fetch");
 const fs = require('fs');
 
-const d1List = [23172];
-const d2List = [
-    23173,
-    23174,
-    23175,
-];
-const d3List = [
-    23176,
-    23177,
-    23178,
-    23179,
-    23180,
-    23181,
-];
-const d4List = [
-    23182,
-    23183,
-    23184,
-    23185,
-    23186,
-    21599,
-    21600,
-    21601,
-    21602,
-];
-const leagueIds = [...d1List, ...d2List, ...d3List, ...d4List];
+const {leagueIds, getDivision} = require('./divisions');
 
-const getDivision = ((leagueId) => {
-    if (d1List.includes(leagueId)){
-        return 1;
-    }
-
-    if (d2List.includes(leagueId)){
-        return 2;
-    }
-
-    if (d3List.includes(leagueId)){
-        return 3;
-    }
-
-    return 4;
-});
-
+//Get all league data
 const promises = leagueIds.map((leagueId) => {
     return fetch(`https://www.fleaflicker.com/api/FetchLeagueStandings?sport=MLB&league_id=${leagueId}`)
         .then((res) => res.json());
 });
 
 Promise.all(promises).then((data) => {
+
+    //Format league data that we will need
     const allStats = data.map((league) => {
         return league.divisions[0].teams.map((team) => {
             return {
@@ -76,7 +38,10 @@ Promise.all(promises).then((data) => {
             }
         });
     });
+    
+    //Merge all leagues to same array
     const statsTogether = [].concat(...allStats);
+
     const teamCount = statsTogether.length;
     const divisionCounts = [
         statsTogether.filter(x => x.division == 1).length,
@@ -108,8 +73,8 @@ Promise.all(promises).then((data) => {
         }
     }
 
+    //Put all stats in category-specific arrays for ranking
     let statObject = new statObjectClass();
-
     statsTogether.forEach((team) => {
         statObject.HR.push(team.stats.HR);
         statObject.R.push(team.stats.R);
@@ -125,6 +90,7 @@ Promise.all(promises).then((data) => {
         statObject.QS.push(team.stats.QS);
     });
 
+    //Put all division-specific stats in category-specific arrays for division rankings
     let allDivisionStats = divisionStats.map((division) => {
         let divisionStatObject = new statObjectClass();
 
@@ -146,6 +112,7 @@ Promise.all(promises).then((data) => {
         return divisionStatObject;
     });
 
+    //Sort arrays used for rankings
     for(const [key, value] of Object.entries(statObject)) {
         if (key == 'ERA' || key == 'WHP'){
             statObject[key] = value.sort((a, b) => a - b);
@@ -154,6 +121,7 @@ Promise.all(promises).then((data) => {
         }
     }
 
+    //Sort all division-specific arrays used for rankings
     allDivisionStats.forEach((division) => {
         for(const [key, value] of Object.entries(division)) {
             if (key == 'ERA' || key == 'WHP'){
@@ -164,6 +132,7 @@ Promise.all(promises).then((data) => {
         }
     });
 
+    //Get overall ranking point value for each specific stat
     const withValues = statsTogether.map((team) => {
         return {
             statValues: {
@@ -184,6 +153,7 @@ Promise.all(promises).then((data) => {
         }
     });
 
+    //Get division-specific ranking point value for each specific stat
     const divisionValues = withValues.map((team) => {
         let localDivisionCount = divisionCounts[team.division - 1];
 
@@ -206,6 +176,7 @@ Promise.all(promises).then((data) => {
         }
     });
 
+    //Calculate/add overall and division point totals
     const withTotal = divisionValues.map((team) => {
         return {
             ...team,
@@ -214,9 +185,10 @@ Promise.all(promises).then((data) => {
         }
     });
 
-    const sortedByTotalPoints = withTotal.sort((a, b) => (a.totalPoints < b.totalPoints) ? 1 : -1);
-    const sortedByDivisionPoints = withTotal.sort((a, b) => (a.divisionPoints < b.divisionPoints) ? 1 : -1);
+    const sortedByTotalPoints = [...withTotal].sort((a, b) => (a.totalPoints < b.totalPoints) ? 1 : -1);
+    const sortedByDivisionPoints = [...withTotal].sort((a, b) => (a.divisionPoints < b.divisionPoints) ? 1 : -1);
 
+    //Calculate/add overall and division rankings based on point totals
     const withOverallRanking = sortedByTotalPoints.map((team) => {
         return {
             ...team,
