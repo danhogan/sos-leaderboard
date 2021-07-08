@@ -156,21 +156,30 @@ Promise.all(promises).then((data) => {
     //Get division-specific ranking point value for each specific stat
     const divisionValues = withValues.map((team) => {
         let localDivisionCount = divisionCounts[team.division - 1];
+        let divisionStats = allDivisionStats[team.division - 1];
+
+        const getPointValue = (statCat) => {
+            let bonus = 0;
+            let timesValueIsInArray = divisionStats[statCat].filter(x => x == team.stats[statCat]).length;
+            bonus = (timesValueIsInArray - 1) * -0.5; //adjust points for categorical ties
+
+            return localDivisionCount - divisionStats[statCat].indexOf(team.stats[statCat]) + bonus;
+        }
 
         return {
             divisionValues: {
-                HR: localDivisionCount - allDivisionStats[team.division - 1].HR.indexOf(team.stats.HR),
-                R: localDivisionCount - allDivisionStats[team.division - 1].R.indexOf(team.stats.R),
-                RBI: localDivisionCount - allDivisionStats[team.division - 1].RBI.indexOf(team.stats.RBI),
-                SB: localDivisionCount - allDivisionStats[team.division - 1].SB.indexOf(team.stats.SB),
-                OBP: localDivisionCount - allDivisionStats[team.division - 1].OBP.indexOf(team.stats.OBP),
-                OPS: localDivisionCount - allDivisionStats[team.division - 1].OPS.indexOf(team.stats.OPS),
-                SO: localDivisionCount - allDivisionStats[team.division - 1].SO.indexOf(team.stats.SO),
-                SV: localDivisionCount - allDivisionStats[team.division - 1].SV.indexOf(team.stats.SV),
-                HD: localDivisionCount - allDivisionStats[team.division - 1].HD.indexOf(team.stats.HD),
-                ERA: localDivisionCount - allDivisionStats[team.division - 1].ERA.indexOf(team.stats.ERA),
-                WHP: localDivisionCount - allDivisionStats[team.division - 1].WHP.indexOf(team.stats.WHP),
-                QS: localDivisionCount - allDivisionStats[team.division - 1].QS.indexOf(team.stats.QS),
+                HR: getPointValue('HR'),
+                R: getPointValue('R'),
+                RBI: getPointValue('RBI'),
+                SB: getPointValue('SB'),
+                OBP: getPointValue('OBP'),
+                OPS: getPointValue('OPS'),
+                SO: getPointValue('SO'),
+                SV: getPointValue('SV'),
+                HD: getPointValue('HD'),
+                ERA: getPointValue('ERA'),
+                WHP: getPointValue('WHP'),
+                QS: getPointValue('QS')
             },
             ...team
         }
@@ -197,8 +206,134 @@ Promise.all(promises).then((data) => {
         }
     });
 
+    //wow this promotion stuff is bad
+    let promotionStuff = withOverallRanking.map((team) => {
+        let promo = '';
+        
+        if (team.division === 1 && team.leagueRank >= 7){
+            promo = 'relegation';
+        }
+        
+        if (team.division === 2){
+            if (team.leagueRank <= 2){
+                promo = 'promotion';
+            }
+            
+            if (team.leagueRank >= 7){
+                promo = 'relegation';
+            }
+        }
+        
+        if (team.division === 3){
+            if (team.leagueRank <= 2){
+                promo = 'promotion';
+            }
+            
+            if (team.leagueRank >= 7){
+                promo = 'relegation';
+            }
+
+            if (team.divisionRank === 1){
+                promo = 'super';
+            }
+        }
+        
+        if (team.division === 4){
+            if (team.leagueRank <= 2){
+                promo = 'promotion';
+            }
+
+            if (team.divisionRank === 1){
+                promo = 'super';
+            }
+        }
+        
+        return {
+            teamId: team.teamId,
+            overallRank: team.overallRank,
+            divisionRank: team.divisionRank,
+            division: team.division,
+            promotion: promo
+        }
+    });
+
+    function notPromoted(x){
+        return x.promotion != 'promotion' && x.promotion != 'super';
+    }
+
+    let d2Bums = promotionStuff
+        .filter(y => y.division === 2)
+        .filter(notPromoted)
+        .sort((a, b) => (a.divisionRank > b.divisionRank) ? 1 : -1)
+        .slice(0, 3);
+    let d3Bums = promotionStuff
+        .filter(y => y.division === 3)
+        .filter(notPromoted)
+        .sort((a, b) => (a.divisionRank > b.divisionRank) ? 1 : -1)
+        .slice(0, 6);
+    let d4Bums = promotionStuff
+        .filter(y => y.division === 4)
+        .filter(notPromoted)
+        .sort((a, b) => (a.divisionRank > b.divisionRank) ? 1 : -1)
+        .slice(0, 12);
+
+    function yesRelegated(x){
+        return x.promotion == 'relegation';
+    }
+
+    let d2SuperBums = promotionStuff
+        .filter(y => y.division === 2)
+        .filter(yesRelegated)
+        .sort((a, b) => (a.divisionRank > b.divisionRank) ? 1 : -1)
+        .slice(0, 5);
+
+    let d3SuperBums = promotionStuff
+        .filter(y => y.division === 3)
+        .filter(yesRelegated)
+        .sort((a, b) => (a.divisionRank > b.divisionRank) ? 1 : -1)
+        .slice(0, 6);
+
+    const morePromotionStuff = withOverallRanking.map((team) => {
+        let promo = promotionStuff.filter(x => x.teamId == team.teamId)[0].promotion;
+        
+        d2Bums.forEach((bum) => {
+            if (bum.teamId == team.teamId){
+                promo = 'promotion';
+            }
+        });
+
+        d2SuperBums.forEach((bum) => {
+            if (bum.teamId == team.teamId){
+                promo = '';
+            }
+        });
+
+        d3Bums.forEach((bum) => {
+            if (bum.teamId == team.teamId){
+                promo = 'promotion';
+            }
+        });
+
+        d3SuperBums.forEach((bum) => {
+            if (bum.teamId == team.teamId){
+                promo = '';
+            }
+        });
+
+        d4Bums.forEach((bum) => {
+            if (bum.teamId == team.teamId){
+                promo = 'promotion';
+            }
+        });
+
+        return {
+            ...team,
+            promotion: promo
+        }
+    });
+
     const withDate = {
-        theData: withOverallRanking,
+        theData: morePromotionStuff,
         updateDate: Date.now()
     }
 

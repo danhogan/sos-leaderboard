@@ -5,6 +5,14 @@
                 <v-chip :key="`thing${index}`" :color="getColor(item[statValueLocation][thing])" dark>{{ item.stats[thing] }} ({{ item[statValueLocation][thing] }})</v-chip>
             </template>
             <template v-slot:[`item.teamName`]="{ item }">
+                <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-icon v-bind="attrs" v-on="on" class="promoIcon" small :color="getPromoColor(item.promotion)">
+                            mdi-checkbox-blank-circle
+                        </v-icon>
+                    </template>
+                    <span>{{getPromoText(item.promotion)}}</span>
+                </v-tooltip>
                 <a target="_blank" :href="`https://www.fleaflicker.com/mlb/leagues/${item.leagueId}/teams/${item.teamId}`">{{item.teamName}}</a>
             </template>
             <template v-slot:[`item.leagueName`]="{ item }">
@@ -74,6 +82,24 @@ export default {
             else if (rank/dataCount < .85) return 'green lighten-2'
             else return 'green'
         },
+        getPromoColor(promoCode){
+            if (promoCode == 'super') return 'blue'
+            else if (promoCode == 'promotion') return 'green'
+            else if (promoCode == 'relegation') return 'red'
+            else return 'yellow darken-2'
+        },
+        getPromoText(promo){
+            switch(promo){
+                case 'super':
+                    return 'Set for double promotion';
+                case 'promotion':
+                    return 'Set for promotion';
+                case 'relegation':
+                    return 'Set for relegation';
+                default:
+                    return 'Set to stay put';
+            }
+        }
     },
 };
 </script>
@@ -81,5 +107,13 @@ export default {
 <style>
 #app .v-data-table > .v-data-table__wrapper > table > tbody > tr > td, .v-data-table > .v-data-table__wrapper > table > tbody > tr > th, .v-data-table > .v-data-table__wrapper > table > thead > tr > td, .v-data-table > .v-data-table__wrapper > table > thead > tr > th, .v-data-table > .v-data-table__wrapper > table > tfoot > tr > td, .v-data-table > .v-data-table__wrapper > table > tfoot > tr > th {
     padding: 0 12px;
+}
+
+#app .v-data-table>.v-data-table__wrapper>table>tbody>tr>td, .v-data-table>.v-data-table__wrapper>table>tfoot>tr>td, .v-data-table>.v-data-table__wrapper>table>thead>tr>td {
+    font-size: 0.8em;
+}
+
+.promoIcon {
+    margin-right: 0.3em;
 }
 </style>
